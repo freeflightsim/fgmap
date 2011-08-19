@@ -103,8 +103,8 @@ Files to tune/edit
 ------------------
 
 1) fgmap.keys:
-	copy the file fgmap.keys.sample to fgmap.keys
-	> cp fgmap.keys.sample fgmap.keys
+	copy the file fgmap.keys.skel to fgmap.keys
+	> cp fgmap.keys.skel fgmap.keys
 
 	Edit fgmap.keys and put the Google Map API key for your site into this file. See the
     comments in the file for more details. This assumes you have enabled

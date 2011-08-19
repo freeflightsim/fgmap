@@ -10,7 +10,7 @@ This writes the servers out to mp_servers.js
 """
 
 # Max number of servers to look
-MAX_MPSERVER_ADDRESS = 4
+MAX_MPSERVER_ADDRESS = 20
 
 import socket
 import telnetlib
@@ -55,7 +55,7 @@ def get_telnet(address, port):
 
 ## Payload 
 ## Not the "mp connectioN" is port 5000, 5002 = admin -1
-mp_servers = {5001: [], 5003: []}
+mp_servers = {'play': [], 'dev': []}
 
 ## Loop range and lookup servers
 for no in range(1, MAX_MPSERVER_ADDRESS + 1):
@@ -72,9 +72,11 @@ for no in range(1, MAX_MPSERVER_ADDRESS + 1):
 			info = get_telnet(ip_address, port) # server_name + ".flightgear.org")
 			if info != None:
 				print " > " , port, "\tOK"
-				mp_servers[port].append( {	'ip': ip_address, 
+				mp_servers['play' if port == 5001 else 'dev'].append( {
+											'ip': ip_address, 
 											'label': "%s:%s" % (server_name, port -1), 
 											'description': "%s:%s" % (server_domain, port -1), 
+											'domain': server_domain,
 											'port': port
 										})
 			else:
@@ -90,7 +92,10 @@ f = open("mp_servers.js", "w")
 js_str = "var MP_SERVERS = " + json.dumps( mp_servers, ensure_ascii=True, )
 f.write(js_str)
 f.close()
-print js_str
+#print js_str
+
+print "mp_servers.js writtern.. done :-)"
+
 
 
 
