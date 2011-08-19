@@ -26,16 +26,16 @@ This is also a beta version of FGMap using Google Earth as well, see below.
 How it works
 ============
 
-At the moment it is pretty simple. The FlightGear server listens on a port for
-TCP connections, known as the "admin" port. When there's an incoming connection
+At the moment it is pretty simple. A FlightGear Miltiplayer server listens on a port for
+TCP connections, known as the "admin" port 5002. When there's an incoming connection
 it answers in plain text who's online and their data, including locations and
 aircraft being used. FGMap uses AJAX to poll the server via a CGI, which
-translate the server admin port output into XML, and then presented onto the
+translates the MP server admin port data output into XML, which is then presented onto the
 map.
 
 In short:
 
-Browser/JavaScript/AJAX <---> HTTP server/CGI <---> FlightGear server
+Browser/JavaScript/AJAX <---> HTTP server/CGI <---> FlightGear MP server
 
 
 This will definitely change in the future, to provide more information on the
@@ -45,6 +45,7 @@ As for the navaids, they are imported into a database (running PostgreSQL) from
 FlightGear's data. The map talks to it using AJAX via a CGI which does queries
 on the database and returns the result in XML.
 
+==todo explain sql scripts ==
 
 
 Getting FGMap
@@ -82,8 +83,9 @@ Hosting FGMap
 Requirements
 ------------
 
-- A Google Map API (GMAPI) key. You have to get it at
-  http://www.google.com/apis/maps/ . You also need a Google/GMail account.
+- A Google Map API (GMAPI) key. Currently FGMap still used version v2 of the 
+  GMAP api (v3 does not require key). You can get a "key" for your domain here.
+  http://code.google.com/apis/maps/signup.html
 
 - A web server with Perl CGI support. This document assumes you use Apache.
   Optionally you can enable server-side-include (SSI) in Apache. In Apache2 the
@@ -100,11 +102,13 @@ Requirements
 Files to tune/edit
 ------------------
 
-fgmap.keys:
+1) fgmap.keys:
+	copy the file fgmap.keys.sample to fgmap.keys
+	> cp fgmap.keys.sample fgmap.keys
 
-You should put the Google Map API key(s) for your site into this file. See the
-comments in the file for more details. This assumes you have enabled
-server-side-include (SSI) in your Apache.
+	Edit fgmap.keys and put the Google Map API key for your site into this file. See the
+    comments in the file for more details. This assumes you have enabled
+    server-side-include (SSI) in your Apache.
 
 After adding your keys(s), you can run 'make', which will update
 fg_server_map.html for you.
