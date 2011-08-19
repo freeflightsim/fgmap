@@ -14,6 +14,9 @@
     }
     </script>
 
+	<!-- list of server from mp_discover.py -->
+	<script src="mp_servers.js"></script>
+
     <script src="fgmap_utils.js"></script>
     <script src="fgmap.js"></script>
     <script src="fgmap_tabbed_div.js"></script>
