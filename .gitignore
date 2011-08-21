@@ -1,5 +1,6 @@
 mp_servers.js
 google_key.js
+cache/*.js
 sg_perl/Makefile.perl
 sg_perl/Makefile.perl.aperl
 sg_perl/blib/arch/.exists
@@ -20,3 +21,4 @@ sg_perl/sgmath.pm
 sg_perl/sgmath_wrap.cxx
 sg_perl/sgmath_wrap.o
 src/fg_server_xml.cgi
+
