@@ -52,6 +52,9 @@ class MPServers:
 	def last_dns(self):
 		return self._last_dns
 	
+	def set_last_dns(self):
+		self._last_dns = datetime.datetime.now()
+	
 	def has_servers(self):
 		return len(self._play) != 0
 
@@ -94,7 +97,7 @@ class MPServers:
 
 ##---------------------------------------------
 ## Fetch DNS  - THREAD function
-def mp_dns_discover(mpServers, last_dns):
+def mp_dns_discover(mpServers):
 	#print "discovermp"
 	for no in range(1, MAX_MPSERVER_ADDRESS + 1):
 		
@@ -126,7 +129,7 @@ def mp_dns_discover(mpServers, last_dns):
 			#print "dns Fail:", server_name
 			mpServers.remove_address(server_name)
 	#MC.set("servers", "FOOOOOOOOOOO")
-	last_dns = datetime.datetime.now()
+	mpServers.set_last_dns()
 	print " DNS Thread Done", last_dns
 	
 ##---------------------------------------------
@@ -194,14 +197,13 @@ def fetch_telnet(address, port, ping=False):
 		#print " telnet err=", address, err
 		return None
 
-last_dns = None
 mpServers = MPServers()
 while True:
 	if mpServers.has_servers() == 0:
 		print "no Servers"
 		dns_thread = threading.Thread(	name='mp_dns_discover',
 										target=mp_dns_discover, 
-										args=(mpServers, last_dns,)
+										args=(mpServers, )
 									)
 		dns_thread.start()
 		time.sleep(5)
@@ -214,6 +216,7 @@ while True:
 			#print flights
 			print " > ", address, len(flights)
 			
+			last_dns = mpServers.last_dns()
 			if last_dns != None:
 				delta = datetime.datetime.now() - last_dns
 				print delta
