@@ -303,12 +303,12 @@ def fromLonLatRad(lonr, latr):
 	Syd2 = math.sin(yd2)
 	Czd2 = math.cos(zd2)
 	Cyd2 = math.cos(yd2)
-	q = []
 	
-	q.append(  - Szd2 * Syd2 ) # x = 0
-	q.append( Czd2 * Syd2 ) # y =1
-	q.append( Szd2 * Cyd2 ) # z = 2
-	q.append( Czd2 * Cyd2 ) # w = 3
+	q = Quat()
+	q.w =  Czd2 * Cyd2
+	q.x =  (Szd2 * -1) * Syd2 
+	q.y =  Czd2 * Syd2 
+	q.z =  Szd2 * Cyd2 
 	return q
 
 
