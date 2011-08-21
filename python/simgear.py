@@ -9,6 +9,12 @@ SGD_MIN = 1.17549e-038
 
 #/// Quaternion
 # x,y,z,w
+class Quat:
+	def __init__(self):
+		self.x = None
+		self.y = None
+		self.z = None
+		self.w = None
 QX = 0
 QY = 1
 QZ = 2
@@ -16,6 +22,11 @@ QW = 3
 
 #/// Vector(3)
 # x,y,z
+class V3:
+	def __init__(self, x=None, y=None, z=None):
+		self.x = x
+		self.y = y
+		self.z = z
 VX = 0
 VY = 1
 VZ = 2
@@ -47,7 +58,8 @@ def show_quat(rv4):
 	#my $y = ${$rv4}[$QY];
 	#my $z = ${$rv4}[$QZ];
 	#my $w = ${$rv4}[$QW];
-	print "x %s, y %s, z %s, w %s" % rv4
+	print rv4
+	#print "x %s, y %s, z %s, w %s" % rv4
 	
 
 # print out a vector3
@@ -67,11 +79,11 @@ def show_vec3(rv3):
 def quat_conj(rq):
 	#my ($rq) = @_;
 	#my @q = (0,0,0,0);
-	q = []
-	q.append( -rq[QX] )
-	q.append( -rq[QY] )
-	q.append( -rq[QZ] )
-	q.append(  rq[QW] )
+	q = Quat()
+	q.x =  rq.x * -1
+	q.y =  rq.y * -1
+	q.z =  rq.z * -1
+	q.w =  rq.w 
 	# return [ -${$rq}[0], -${$rq}[1], -${$rq}[2], ${$rq}[3] ];
 	return q
 
@@ -81,17 +93,17 @@ def quat_conj(rq):
 def mult_quats(rv1, rv2):
 	#my ($rv1,$rv2) = @_;
 	#my @v = (0,0,0,0);
-	v = []
+	q = Quat()
 	""" $v[$QX] = ${$rv1}[$QW] * ${$rv2}[$QX] + ${$rv1}[$QX] * ${$rv2}[$QW] + ${$rv1}[$QY] * ${$rv2}[$QZ] - ${$rv1}[$QZ] * ${$rv2}[$QY];
 	$v[$QY] = ${$rv1}[$QW] * ${$rv2}[$QY] - ${$rv1}[$QX] * ${$rv2}[$QZ] + ${$rv1}[$QY] * ${$rv2}[$QW] + ${$rv1}[$QZ] * ${$rv2}[$QX];
 	$v[$QZ] = ${$rv1}[$QW] * ${$rv2}[$QZ] + ${$rv1}[$QX] * ${$rv2}[$QY] - ${$rv1}[$QY] * ${$rv2}[$QX] + ${$rv1}[$QZ] * ${$rv2}[$QW];
 	$v[$QW] = ${$rv1}[$QW] * ${$rv2}[$QW] - ${$rv1}[$QX] * ${$rv2}[$QX] - ${$rv1}[$QY] * ${$rv2}[$QY] - ${$rv1}[$QZ] * ${$rv2}[$QZ];
 	"""
-	v,append( rv1[QW] * rv2[QX] + rv1[QX] * rv2[QW] + rv1[QY] * rv2[QZ] - rv1[QZ] * rv2[QY] )
-	v,append( rv1[QW] * rv2[QY] - rv1[QX] * rv2[QZ] + rv1[QY] * rv2[QW] + rv1[QZ] * rv2[QX] )
-	v,append( rv1[QW] * rv2[QZ] + rv1[QX] * rv2[QY] - rv1[QY] * rv2[QX] + rv1[QZ] * rv2[QW] )
-	v,append( rv1[QW] * rv2[QW] - rv1[QX] * rv2[QX] - rv1[QY] * rv2[QY] - rv1[QZ] * rv2[QZ] )
-	return v
+	q.x =  rv1[QW] * rv2[QX] + rv1[QX] * rv2[QW] + rv1[QY] * rv2[QZ] - rv1[QZ] * rv2[QY] 
+	q.y =  rv1[QW] * rv2[QY] - rv1[QX] * rv2[QZ] + rv1[QY] * rv2[QW] + rv1[QZ] * rv2[QX] 
+	q.z =  rv1[QW] * rv2[QZ] + rv1[QX] * rv2[QY] - rv1[QY] * rv2[QX] + rv1[QZ] * rv2[QW] 
+	q.w =  rv1[QW] * rv2[QW] - rv1[QX] * rv2[QX] - rv1[QY] * rv2[QY] - rv1[QZ] * rv2[QZ] 
+	return q
 
 
 #SGVec3<T> mult(const SGVec3<T>& v1, const SGVec3<T>& v2)
@@ -155,33 +167,33 @@ def scalar_mult_vector(s, rv):
 def getEulerRad(rq):
 	#my ($rq, $rzRad, $ryRad, $rxRad) = @_;
 	#my ($xRad,$yRad,$zRad);
-	sqrQW = rq[QW] * rq[QW]
-	sqrQX = rq[QX] * rq[QX]
-	sqrQY = rq[QY] * rq[QY]
-	sqrQZ = rq[QZ] * rq[QZ]
+	sqrQW = rq.w * rq.w
+	sqrQX = rq.x * rq.x
+	sqrQY = rq.y * rq.y
+	sqrQZ = rq.z * rq.z
 
 	# y * z + w * x
-	num = 2 * ( rq[QY] * rq[QZ] + rq[QW] * rq[QX] )
+	num = 2 * ( rq.y * rq.z + rq.w * rq.x )
 	den = sqrQW - sqrQX - sqrQY + sqrQZ
-	if abs(den) <= 0.0000001) && (abs(num) <= 0.0000001):
+	if abs(den) <= 0.0000001 and abs(num) <= 0.0000001:
 		xRad = 0
 	else:
 		xRad = math.atan2(num, den)
 	
 	# x * z - w * y
-	tmp = 2 * ( rq[QX] * rq[QZ] - rq[QW] * rq[QY] )
+	tmp = 2 * ( rq.x * rq.z - rq.w * rq.y )
 	if tmp <= -1:
 		yRad = 0.5 * SGD_PI
-	elif 1 <= $tmp:
+	elif 1 <= tmp:
 		yRad = - 0.5 * SGD_PI
 	else:
 		yRad = -math.asin(tmp) # needs Math::Trig
 	
 
 	# x * y + w * z
-	num = 2 * ( rq[QX] * rq[QY] + rq[QW] * rq[QZ] ) 
+	num = 2 * ( rq.x * rq.y + rq.w * rq.z ) 
 	den = sqrQW + sqrQX - sqrQY - sqrQZ
-	if abs($den) <= 0.0000001) && (abs($num) <= 0.0000001:
+	if abs(den) <= 0.0000001 and abs(num) <= 0.0000001:
 		zRad = 0
 	else:
 		psi = math.atan2(num, den)
@@ -197,15 +209,18 @@ def getEulerRad(rq):
 
 
 # uses getEulerRad, and converts to degrees
-def getEulerDeg(rq,rzDeg,ryDeg,rxDeg):
+def getEulerDeg(rq): #, rroll, rpitch, rhead):
 	#my ($rq,$rzDeg,$ryDeg,$rxDeg) = @_;
 	#my ($xRad,$yRad,$zRad);
-	xRad, yRad, zRad = getEulerRad(rq )# , \$xRad, \$yRad, \$zRad)
+	xRad, yRad, zRad = getEulerRad( rq )# , \$xRad, \$yRad, \$zRad)
 	# pass converted values back
 	#${$rzDeg} = fgs_rad2deg($zRad);
 	#${$ryDeg} = fgs_rad2deg($yRad);
 	#${$rxDeg} = fgs_rad2deg($xRad);
-	return fgs_rad2deg(xRad), fgs_rad2deg(yRad), fgs_rad2deg(zRad);
+	roll = fgs_rad2deg(zRad)
+	pitch = fgs_rad2deg(yRad)
+	heading = fgs_rad2deg(xRad)
+	return roll, pitch, heading
 
 
 def fgs_rad2deg(rad):
@@ -242,23 +257,23 @@ def fromRealImag(r, ri):
 #      return SGQuat::unit();
 #    T angle2 = T(0.5)*nAxis;
 #    return fromRealImag(cos(angle2), T(sin(angle2)/nAxis)*axis); }
-def fromAngleAxis(raxis) {
+def fromAngleAxis(raxis):
 	#my ($raxis) = @_;
 	nAxis = norm_vector_length(raxis);
-	if (nAxis <= 0.0000001) {
-		arr = (0,0,0,0)
-		return arr; # SGQuat::unit();
-	}
+	if nAxis <= 0.0000001:
+		arr = [0,0,0,0]
+		return arr # SGQuat::unit();
+	
 	angle2 = nAxis * 0.5
 	sang = math.sin(angle2) / nAxis 
 	cang = math.cos(angle2)
 	#print "nAxis = $nAxis, ange2 = $angle2, saxa = $sang\n";
-	rv = scalar_mult_vector(sang, raxis);
+	rv = scalar_mult_vector(sang, raxis)
 	#print "san ";
 	#show_vec3($rv);
 	#return fromRealImag(cos(angle2), T(sin(angle2)/nAxis)*axis);
 	return fromRealImag( cang, rv );
-}
+
 
 #  /// Return a quaternion rotation from the earth centered to the
 #  /// simulation usual horizontal local frame from given
@@ -322,7 +337,7 @@ def fromLonLatRad(lonr, latr):
 #    if(roll)
 #        *roll = rDeg;
 #}
-def euler_get(lat, lon, ox, oy, oz) {
+def euler_get(lat, lon, ox, oy, oz):
 	#my ($lat, $lon, $ox, $oy, $oz, $rhead, $rpitch, $rroll) = @_;
 	#/* FGMultiplayMgr::ProcessPosMsg */
 	#my @angleAxis = ($ox,$oy,$oz);
@@ -348,8 +363,9 @@ def euler_get(lat, lon, ox, oy, oz) {
 	rhlOr = mult_quats(con, recOrient);
 	#print "mult ";
 	#show_quat($rhlOr);
-	getEulerDeg($rhlOr, $rroll, $rpitch, $rhead );
-}
+	roll, pitch, heading = getEulerDeg(rhlOr) #, rroll, rpitch, rhead) #, $rroll, $rpitch, $rhead )
+	return roll, pitch, heading
+
 
 # ================================================================ #
 # End SimGear Fuctions
