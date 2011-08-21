@@ -1468,9 +1468,12 @@ FGMap.prototype.map_update = function(force) {
 
     this.updating = true;
 
-    var url = "fg_server_xml.cgi?" +
+    /*var url = "fg_server_xml.cgi?" +
                 this.fg_server_current.host + ":" +
                 this.fg_server_current.port;
+	*/
+	var url = "cache/flights.xml";
+	
 
     this.xml_request = GXmlHttp.create();
     this.xml_request.open("GET", url, true);

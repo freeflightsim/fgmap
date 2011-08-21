@@ -7,7 +7,7 @@ date_default_timezone_set('UTC');
 
 
 //= Max number of dns servers to lookup.
-define('MAX_MPSERVER_ADDRESS', 10);
+define('MAX_MPSERVER_ADDRESS', 5);
 
 define('MP_REFRESH_RATE', 2000);
 
@@ -72,21 +72,29 @@ function fetch_mp_telnet($address, $port){
 
 			$line = trim(fgets($fp));
 			//echo "@".$line;
-
+              /* my($callsign, $server_ip,
+                        $x, $y, $z,
+                        $lat, $lon, $alt,
+                        $ox, $oy, $oz,
+                        $model) =
+                    ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12); */
 			if(substr($line, 0, 1) != '#' and $line != ''){ //= Ignore blank and comments Lines
 				$parts = explode(' ', $line);
 				list($callsign, $server) = explode('@', $parts[0]);
 				$pilots[] = array('callsign' => $callsign,
 								'server' => $server,
-								'lat' => $parts[5], 
-								'lon' => $parts[6],
-								'altitude' => $parts[7],
-								'heading' =>$parts[8],
+								'lat' => $parts[4], 
+								'lon' => $parts[5],
+								'altitude' => $parts[6],
+								'heading' =>$parts[7],
 								'pitch' => '',
 								'roll' => '',
 								'model' => basename($parts[10], '.xml')
 								);
-				print_r($parts);
+				if($callsign == "MIA0024"){
+					print_r($parts);
+				}
+				
 			}
 
 		}

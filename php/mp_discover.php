@@ -28,8 +28,7 @@ $payload = array('play' => array(), 'dev' => array() );
 //= Timing keeps the time it took to connect
 $timing = array();
 
-foreach(range(1, MAX_MPSERVER_ADDRESS ) as $no){
-
+for($no = 1; $no <= MAX_MPSERVER_ADDRESS; $no++){
 	//= Lookup DNS	
 	$server_name = sprintf('mpserver%02d', $no);
 	$server_domain = $server_name.'.flightgear.org';
@@ -39,17 +38,17 @@ foreach(range(1, MAX_MPSERVER_ADDRESS ) as $no){
 	//= We have and address (gethostbyname returns same host if no address)
 	if($server_domain != $ip_address){
 		
-		echo ' + dns OK: '.$server_name.'='.$ip_address."\n";
+		echo ' + dns OK: '.$server_name.'  =  '.$ip_address."\n";
 		foreach(array(5000, 5002) as $port){
 			$admin_port = $port + 1;
 			//= open and fetch telnet data
 			$start = microtime(true);
-			$info = fetch_telnet($ip_address, $admin_port); //= use admin port
+			$info = fetch_mp_telnet($ip_address, $admin_port); //= use admin port
 			$ms = (microtime(true)  - $start) * 1000;
 
 			if( !is_null($info) ){
 				echo "   + Telnet $admin_port OK\n";
-				$payload[ $port == 5000 ? 'play' : 'dev'] = array(
+				$payload[ $port == 5000 ? 'play' : 'dev'][] = array(
 																	'ip' => $ip_address,
 																	'label' => $server_name.':'.$port,
 																	'description' => $server_domain.':'.$port,
@@ -83,6 +82,6 @@ $json_str = json_encode($payload);
 file_put_contents(MP_JSON_FILE , $json_str);
 file_put_contents(MP_JS_FILE, 'var MP_SERVERS = '.$json_str);
 
-echo 'Done - '.count($mp_servers['play']).' live servers';
+echo 'Done - '.count($payload['play']).' live servers';
 
 ?>
