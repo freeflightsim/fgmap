@@ -80,8 +80,8 @@ $payload['fastest'] = array_keys($timing);
 
 // write to cache
 $json_str = json_encode($payload);
-file_put_contents(CACHE_DIR.'mp_servers_json.js', $json_str);
-file_put_contents(CACHE_DIR.'mp_servers_js.js', 'var MP_SERVERS = '.$json_str);
+file_put_contents(MP_JSON_FILE , $json_str);
+file_put_contents(MP_JS_FILE, 'var MP_SERVERS = '.$json_str);
 
 echo 'Done - '.count($mp_servers['play']).' live servers';
 

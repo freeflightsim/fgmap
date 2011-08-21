@@ -1,6 +1,7 @@
 mp_servers.js
 google_key.js
 cache/*.js
+cache/*.xml
 sg_perl/Makefile.perl
 sg_perl/Makefile.perl.aperl
 sg_perl/blib/arch/.exists
