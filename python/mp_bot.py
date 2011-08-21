@@ -47,10 +47,14 @@ class MPServers:
 		self._play = {}
 		self._dev = {}
 		self._fastest = {}
-
-
+		self._last_dns = None
+		
+	def last_dns(self):
+		return self._last_dns
+	
 	def has_servers(self):
 		return len(self._play) != 0
+
 
 	def add_address(self, server_name, address):
 		self._addrs[server_name] = address
@@ -58,6 +62,7 @@ class MPServers:
 	def remove_address(self, server_name):
 		if server_name in self._addrs:
 			del self._addrs[server_name]
+
 
 	def add_mp(self, server_name, port, info):
 		if port == 5000:
@@ -88,8 +93,8 @@ class MPServers:
 		return self._play[server_name]['ip']
 
 ##---------------------------------------------
-## Fetch DNS from
-def mp_dns_discover(mpServers):
+## Fetch DNS  - THREAD function
+def mp_dns_discover(mpServers, last_dns):
 	#print "discovermp"
 	for no in range(1, MAX_MPSERVER_ADDRESS + 1):
 		
@@ -120,8 +125,9 @@ def mp_dns_discover(mpServers):
 		else:
 			#print "dns Fail:", server_name
 			mpServers.remove_address(server_name)
-	MC.set("servers", "FOOOOOOOOOOO")
-	print " DNS Thread Done";
+	#MC.set("servers", "FOOOOOOOOOOO")
+	last_dns = datetime.datetime.now()
+	print " DNS Thread Done", last_dns
 	
 ##---------------------------------------------
 ## Does a DNS loopkup of a server eg mpserver07
@@ -188,12 +194,15 @@ def fetch_telnet(address, port, ping=False):
 		#print " telnet err=", address, err
 		return None
 
-
+last_dns = None
 mpServers = MPServers()
 while True:
 	if mpServers.has_servers() == 0:
 		print "no Servers"
-		dns_thread = threading.Thread(name='mp_dns_discover', target=mp_dns_discover, args=(mpServers,))
+		dns_thread = threading.Thread(	name='mp_dns_discover',
+										target=mp_dns_discover, 
+										args=(mpServers, last_dns,)
+									)
 		dns_thread.start()
 		time.sleep(5)
 	else:
@@ -204,6 +213,10 @@ while True:
 			flights = fetch_telnet(address, 5001)
 			#print flights
 			print " > ", address, len(flights)
+			
+			if last_dns != None:
+				delta = datetime.datetime.now() - last_dns
+				print delta
 		time.sleep(2)
 
 
