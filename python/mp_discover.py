@@ -24,7 +24,6 @@ except:
 ## Does a DNS loopkup of a server eg mpserver07
 def lookup_server(server_domain):
 
-
 	try:
 		addr = socket.gethostbyname(server_domain) #, PORT)		
 		return addr

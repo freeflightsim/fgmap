@@ -1,16 +1,43 @@
 #!/usr/bin/env python
 
+import os
 import sys
 import time
 import datetime
 
 import threading
+
 import telnetlib
 import socket
 
 import operator
+import random
 
 import simgear
+
+""" TODO
+import ConfigParser
+conf = ConfigParser.ConfigParser()
+conf.read("../config/config.ini")
+
+
+MC = None
+if conf.get("memcache", "enabled") == "1":
+	MC_SERVERS_KEY = conf.get("memcache", "servers_key")
+	MC_FLIGHTS_KEY = conf.get("memcache", "flights_key")
+	import memcache
+	MC = memcache.Client([conf.get("memcache", "url")])	
+"""
+SITE_DIR = os.path.abspath(os.path.join( os.path.dirname(os.path.abspath(__file__)), "../"))
+
+CACHE_DIR = SITE_DIR + "/cache/"
+MP_JSON_FILE = CACHE_DIR + 'mp_servers_json.js'
+MP_JS_FILE = CACHE_DIR + 'mp_servers_js.js'
+MP_FLIGHTS_XML = CACHE_DIR + 'flights.xml'
+
+#print SITE_DIR, CACHE_DIR, MP_JS_FILE
+#sys.exit(1)
+
 
 MAX_MPSERVER_ADDRESS = 5
 
@@ -51,8 +78,15 @@ class MPServers:
 				del self._dev[server_name]
 				
 	def random(self):
+		# srtoex_d x is a list of  tuples with (server_name, lag)
 		sorted_x = sorted(self._fastest.iteritems(), key=operator.itemgetter(1))
-		print sorted_x
+		lenny = len(sorted_x)
+		if lenny == 0:
+			return
+		randy = random.randint(0, 3 if lenny > 4 else lenny - 1)
+		server_name =  sorted_x[ randy ][0]
+		return self._play[server_name]['ip']
+
 ##---------------------------------------------
 ## Fetch DNS from
 def mp_dns_discover(mpServers):
@@ -71,7 +105,7 @@ def mp_dns_discover(mpServers):
 				admin_port = port + 1
 				lag = fetch_telnet(ip_address, admin_port, ping=True) 
 				if lag != None:
-					#print " > " , port, "\tOK"
+					print " > " , server_name, port, "\tOK"
 					info =  {	'ip': ip_address, 
 								'label': "%s:%s" % (server_name, port), 
 								'description': "%s:%s" % (server_domain, port), 
@@ -85,8 +119,10 @@ def mp_dns_discover(mpServers):
 					mpServers.remove_mp(server_name, port)
 		else:
 			#print "dns Fail:", server_name
-			MPServers.remove_address(server_name)
-
+			mpServers.remove_address(server_name)
+	MC.set("servers", "FOOOOOOOOOOO")
+	print " DNS Thread Done";
+	
 ##---------------------------------------------
 ## Does a DNS loopkup of a server eg mpserver07
 def dns_lookup_server(server_domain):
@@ -113,7 +149,7 @@ def fetch_telnet(address, port, ping=False):
 		
 		delta = datetime.datetime.now() - start 
 		ms = (delta.seconds * 1000) + (delta.microseconds / 1000)
-		print  "diff=", delta.seconds, delta.microseconds, ms
+		#print  "diff=", delta.seconds, delta.microseconds, ms
 		
 		if ping:
 			return ms
@@ -162,8 +198,12 @@ while True:
 		time.sleep(5)
 	else:
 		address = mpServers.random()
-		print address
-		#flights = fetch_telnet(address, 5001)
-		#print flights
+		if address == None:
+			pass
+		else:
+			flights = fetch_telnet(address, 5001)
+			#print flights
+			print " > ", address, len(flights)
+		time.sleep(2)
 
 
