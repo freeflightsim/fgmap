@@ -15,21 +15,21 @@ class Quat:
 		self.y = None
 		self.z = None
 		self.w = None
-QX = 0
-QY = 1
-QZ = 2
-QW = 3
 
 #/// Vector(3)
 # x,y,z
-class V3:
-	def __init__(self, x=None, y=None, z=None):
-		self.x = x
-		self.y = y
-		self.z = z
-VX = 0
-VY = 1
-VZ = 2
+class Vec3:
+	def __init__(self):
+		self.x = None
+		self.y = None
+		self.z = None
+
+class RetVars:
+	def __init__(self):
+		self.roll = None
+		self.pitch = None
+		self.heading = None
+
 
 
 # ============================================================ #
@@ -39,8 +39,7 @@ VZ = 2
 # { return v1(0)*v2(0) + v1(1)*v2(1) + v1(2)*v2(2); }
 # Given 2 Vectors3, return the dot product
 def scalar_dot_product(rv1, rv2):
-	#my ($rv1,$rv2) = @_;
-	return rv1[0] * rv2[0] + rv1[1] * rv2[1] + rv1[2] * rv2[2];
+	return rv1.x * rv2.x + rv1.y * rv2.y + rv1.z * rv2.z;
 
 
 # The euclidean norm of the vector, that is what most people call length
@@ -58,7 +57,9 @@ def show_quat(rv4):
 	#my $y = ${$rv4}[$QY];
 	#my $z = ${$rv4}[$QZ];
 	#my $w = ${$rv4}[$QW];
-	print rv4
+	#print rv4
+	pass
+	
 	#print "x %s, y %s, z %s, w %s" % rv4
 	
 
@@ -99,10 +100,10 @@ def mult_quats(rv1, rv2):
 	$v[$QZ] = ${$rv1}[$QW] * ${$rv2}[$QZ] + ${$rv1}[$QX] * ${$rv2}[$QY] - ${$rv1}[$QY] * ${$rv2}[$QX] + ${$rv1}[$QZ] * ${$rv2}[$QW];
 	$v[$QW] = ${$rv1}[$QW] * ${$rv2}[$QW] - ${$rv1}[$QX] * ${$rv2}[$QX] - ${$rv1}[$QY] * ${$rv2}[$QY] - ${$rv1}[$QZ] * ${$rv2}[$QZ];
 	"""
-	q.x =  rv1[QW] * rv2[QX] + rv1[QX] * rv2[QW] + rv1[QY] * rv2[QZ] - rv1[QZ] * rv2[QY] 
-	q.y =  rv1[QW] * rv2[QY] - rv1[QX] * rv2[QZ] + rv1[QY] * rv2[QW] + rv1[QZ] * rv2[QX] 
-	q.z =  rv1[QW] * rv2[QZ] + rv1[QX] * rv2[QY] - rv1[QY] * rv2[QX] + rv1[QZ] * rv2[QW] 
-	q.w =  rv1[QW] * rv2[QW] - rv1[QX] * rv2[QX] - rv1[QY] * rv2[QY] - rv1[QZ] * rv2[QZ] 
+	q.x =  rv1.w * rv2.x + rv1.x * rv2.w + rv1.y * rv2.z - rv1.z * rv2.y
+	q.y =  rv1.w * rv2.y - rv1.x * rv2.z + rv1.y * rv2.w + rv1.z * rv2.x
+	q.z =  rv1.w * rv2.z + rv1.x * rv2.y - rv1.y * rv2.x + rv1.z * rv2.w
+	q.w =  rv1.w * rv2.w - rv1.x * rv2.x - rv1.y * rv2.y - rv1.z * rv2.z 
 	return q
 
 
@@ -125,10 +126,10 @@ sub mult_vec3($$) {
 #{ return SGVec3<T>(s*v(0), s*v(1), s*v(2)); }
 def scalar_mult_vector(s, rv):
 	#my @v = (0,0,0);
-	v = [] 
-	v.append( rv[0] * s )
-	v.append( rv[1] * s )
-	v.append( rv[2] * s )
+	v = Vec3()
+	v.x = rv.x * s 
+	v.y = rv.y * s 
+	v.z = rv.z * s 
 	return v
 
 
@@ -199,10 +200,14 @@ def getEulerRad(rq):
 		psi = math.atan2(num, den)
 		if psi < 0:
 			psi += 2 * SGD_PI
-		zRad = psi;
+		zRad = psi
 	
 	# pass value back
-	return xRad, yRad, zRad
+	rad = Vec3()
+	rad.x = xRad
+	rad.y = yRad
+	rad.z = zRad
+	return rad
 	#${$rxRad} = $xRad;
 	#${$ryRad} = $yRad;
 	#${$rzRad} = $zRad;
@@ -212,15 +217,16 @@ def getEulerRad(rq):
 def getEulerDeg(rq): #, rroll, rpitch, rhead):
 	#my ($rq,$rzDeg,$ryDeg,$rxDeg) = @_;
 	#my ($xRad,$yRad,$zRad);
-	xRad, yRad, zRad = getEulerRad( rq )# , \$xRad, \$yRad, \$zRad)
+	rads = getEulerRad( rq )# , \$xRad, \$yRad, \$zRad)
 	# pass converted values back
 	#${$rzDeg} = fgs_rad2deg($zRad);
 	#${$ryDeg} = fgs_rad2deg($yRad);
 	#${$rxDeg} = fgs_rad2deg($xRad);
-	roll = fgs_rad2deg(zRad)
-	pitch = fgs_rad2deg(yRad)
-	heading = fgs_rad2deg(xRad)
-	return roll, pitch, heading
+	ob = RetVars()
+	ob.heading = fgs_rad2deg(rads.z)
+	ob.pitch = fgs_rad2deg(rads.y)
+	ob.roll = fgs_rad2deg(rads.x)
+	return ob
 
 
 def fgs_rad2deg(rad):
@@ -241,11 +247,11 @@ def fromRealImag(r, ri):
 	#QY = 1
 	#QZ = 2
 	#QW = 3
-	q = []
-	q.append( ri[0] )
-	q.append( ri[1] )
-	q.append( ri[2] )
-	q.append( r )
+	q = Quat()
+	q.w = r 
+	q.x = ri.x
+	q.y = ri.y
+	q.z = ri.z
 	return q
 
 
@@ -341,14 +347,17 @@ def euler_get(lat, lon, ox, oy, oz):
 	#my ($lat, $lon, $ox, $oy, $oz, $rhead, $rpitch, $rroll) = @_;
 	#/* FGMultiplayMgr::ProcessPosMsg */
 	#my @angleAxis = ($ox,$oy,$oz);
-	angleAxis = [ox, oy, oz]
+	angleAxis = Vec3()
+	angleAxis.x = ox 
+	angleAxis.y = oy
+	angleAxis.z = oz
 	#push(@angleAxis, $ox);
 	#push(@angleAxis, $oy);
 	#push(@angleAxis, $oz);
 	#print "angleAxis ";
 	#show_vec3(\@angleAxis);
 	recOrient = fromAngleAxis(angleAxis) # ecOrient = SGQuatf::fromAngleAxis(angleAxis);
-	print "recOrient "
+	#print "recOrient "
 	show_quat(recOrient)
 	#/* FGAIMultiplayer::update */
 	#my ($lat_rad, $lon_rad);
@@ -363,8 +372,8 @@ def euler_get(lat, lon, ox, oy, oz):
 	rhlOr = mult_quats(con, recOrient);
 	#print "mult ";
 	#show_quat($rhlOr);
-	roll, pitch, heading = getEulerDeg(rhlOr) #, rroll, rpitch, rhead) #, $rroll, $rpitch, $rhead )
-	return roll, pitch, heading
+	ob = getEulerDeg(rhlOr) #, rroll, rpitch, rhead) #, $rroll, $rpitch, $rhead )
+	return ob
 
 
 # ================================================================ #

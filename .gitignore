@@ -1,3 +1,4 @@
+*.pyc
 mp_servers.js
 google_key.js
 cache/*.js
