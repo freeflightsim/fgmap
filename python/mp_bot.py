@@ -12,6 +12,7 @@ import socket
 
 import operator
 import random
+from string import Template
 
 import simgear
 
@@ -98,7 +99,7 @@ class MPServers:
 ##---------------------------------------------
 ## Fetch DNS  - THREAD function
 def mp_dns_discover(mpServers):
-	#print "discovermp"
+	print " DNS Thread Starting"
 	for no in range(1, MAX_MPSERVER_ADDRESS + 1):
 		
 		server_name = "mpserver%02d" % no
@@ -130,7 +131,7 @@ def mp_dns_discover(mpServers):
 			mpServers.remove_address(server_name)
 	#MC.set("servers", "FOOOOOOOOOOO")
 	mpServers.set_last_dns()
-	print " DNS Thread Done", last_dns
+	print " DNS Thread Done"
 	
 ##---------------------------------------------
 ## Does a DNS loopkup of a server eg mpserver07
@@ -177,8 +178,9 @@ def fetch_telnet(address, port, ping=False):
 				dic = {}
 				dic['callsign'] = callsign
 				dic['server'] = server
+				dic['model'] = parts[10]
 				dic['lat'] = parts[4]
-				dic['lng'] = parts[5]
+				dic['lon'] = parts[5]
 				dic['altitude'] = parts[6]
 				   
 				ob = simgear.euler_get(	float(parts[4]), float(parts[5]), # lat lon
@@ -197,29 +199,56 @@ def fetch_telnet(address, port, ping=False):
 		#print " telnet err=", address, err
 		return None
 
-mpServers = MPServers()
-while True:
-	if mpServers.has_servers() == 0:
-		print "no Servers"
-		dns_thread = threading.Thread(	name='mp_dns_discover',
-										target=mp_dns_discover, 
-										args=(mpServers, )
+##===============================
+def flights_to_xml(flights):
+	xml = '<fg_server pilot_cnt="%s">' % len(flights)
+	template = Template('<marker callsign="$callsign" server_ip="$server" model="$model" lat="$lat" lng="$lon" alt="30641.731970" heading="67.7801361083984" pitch="-0.892871916294098" roll="-0.28925558924675"/>')
+	for f in flights:
+		xml += template.substitute(callsign=f['callsign'], server=f['server'], model=f['model'], 
+									lat=f['lat'], lon=f['lon'],
+									heading=f['heading'], pitch=f['pitch'], roll=f['roll']
 									)
-		dns_thread.start()
-		time.sleep(5)
+	xml += "</fg_server>"
+	return xml
+
+
+##==========================================================================
+dns_done = False
+mpServers = MPServers()
+
+## create and start DNS threat - runs once atmo
+dnsThread = threading.Thread(	name='mp_dns_discover',
+								target=mp_dns_discover, 
+								args=(mpServers, )
+							)
+dnsThread.start()
+
+## give dns 5 second.. to get a few entries
+time.sleep(5)
+
+
+while True:
+	address = mpServers.random()
+	if address == None:
+		pass
 	else:
-		address = mpServers.random()
-		if address == None:
-			pass
-		else:
-			flights = fetch_telnet(address, 5001)
-			#print flights
-			print " > ", address, len(flights)
-			
-			last_dns = mpServers.last_dns()
-			if last_dns != None:
-				delta = datetime.datetime.now() - last_dns
-				print delta
-		time.sleep(2)
+		flights = fetch_telnet(address, 5001)
+		#print flights
+		print " > ", address #, len(flights) 
+		
+		
+		if flights != None:
+			f = open(MP_FLIGHTS_XML, "w")
+			f.write( flights_to_xml(flights) )
+			f.close()
+		"""
+		last_dns = mpServers.last_dns()
+		if last_dns != None:
+			delta = datetime.datetime.now() - last_dns
+			print delta, dnsThread.is_alive()
+			if delta.seconds > 20 and dnsThread.is_alive() == False:
+				dnsThread.start()
+		"""
+	time.sleep(2)
 
 
