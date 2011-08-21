@@ -2,6 +2,8 @@
 
 error_reporting(E_ALL);
 
+date_default_timezone_set('UTC');
+
 $data = '';
 $url='mpserver01.flightgear.org';
 
@@ -12,6 +14,8 @@ $errstr = "";
 $flights = array();
 $cols = array('callsign', '1', '2','3','lat','lng','6','7','8','9','model');
 
+$data = array('success' => true, 'utc' => time());
+
 $fp = @fsockopen($url, 5001, $errno, $errstr, 1);
 if ($fp) {
     stream_set_timeout($fp, 2);    
@@ -19,13 +23,11 @@ if ($fp) {
 		$line = trim(fgets($fp));
 		//echo "@".$line;
 
-		
 		if(substr($line, 0, 1) != '#'){ //= Ignore comments Lines
 			$parts = split(' ', $line);
 			$callsign_server = $parts[0];
 			$lat = $parts[5];
 			$lon = $parts[6];
-
 		}
 
 	}
