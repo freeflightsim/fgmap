@@ -15,7 +15,6 @@ import telnetlib
 import socket
 
 import operator
-#import random
 from string import Template
 
 try:
@@ -308,9 +307,10 @@ c = 0
 ## Loop forever and query mp via telnet
 while True:
 	c = c + 1
-	#address = mpServers.random()
-	#address = "85.214.37.14" 01
-	address = "74.208.230.119" #02
+	#address = "85.214.37.14" #mpserver01
+	#address = "74.208.230.119" #mpserver02
+	address = mpServers.fastest()
+	
 	if address == None:
 		pass
 	else:
@@ -327,20 +327,11 @@ while True:
 				try:
 					MC.set(MC_FLIGHTS_KEY, json.dumps(flights))
 					MC.set("foo", datetime.datetime.now().strftime(DATE_FORMAT))
-					print "MC OK flights", MC_FLIGHTS_KEY
+					#print "MC OK flights", MC_FLIGHTS_KEY
 				except:
 					pass
 					#print "MC FAIL flights"
-		"""
-		last_dns = mpServers.last_dns()
-		if last_dns != None:
-			delta = datetime.datetime.now() - last_dns
-			print "            ", c, delta, statusThread.is_alive()
-			if delta.seconds > 10 and statusThread.is_alive() == False:
-				print "START>>>>>>>>>>>>>>>>"
-				## BELOW= RuntimeError: thread already started
-				statusThread.start()
-		"""
+
 	time.sleep(FLIGHTS_REFRESH_RATE)
 
 
