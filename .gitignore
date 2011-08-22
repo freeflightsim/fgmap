@@ -1,4 +1,6 @@
 *.pyc
+config/config.ini
+config/config.js
 mp_servers.js
 google_key.js
 cache/*.js

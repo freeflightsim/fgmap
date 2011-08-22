@@ -1,3 +1,12 @@
+"""
+This is a python port of some simgear math
+author: Pete Morgan - pete@freeflightsim.org
+
+The original was a perl script By Geoff McLane
+http://geoffair.org/mperl/samples/fg_server_xml2.htm
+thanks Geoff! ;-)
+
+"""
 
 import math
 
@@ -7,7 +16,7 @@ SGD_RADIANS_TO_DEGREES = 180.0 / SGD_PI
 SGD_MIN = 1.17549e-038
 
 
-#/// Quaternion
+# Quaternion
 # x,y,z,w
 class Quat:
 	def __init__(self):
@@ -15,8 +24,11 @@ class Quat:
 		self.y = None
 		self.z = None
 		self.w = None
-
-#/// Vector(3)
+		
+	def __repr__(self):
+		return "x %s, y %s, z %s, w %s" % (rv4.x, rv4.y, rv4.z, rv4.w)
+		
+# Vector(3)
 # x,y,z
 class Vec3:
 	def __init__(self):
@@ -24,16 +36,18 @@ class Vec3:
 		self.y = None
 		self.z = None
 
+# Return Variables
 class RetVars:
 	def __init__(self):
 		self.roll = None
 		self.pitch = None
 		self.heading = None
-
+	def __repr__(self):
+		return "roll: %s, pitch: %s, heading: %s" % (self.roll, self.pitch, self.heading)
 
 
 # ============================================================ #
-# SimGear Services, rendered in perl - Python
+# SimGear Services, rendered in  Python
 # ============================================================ #
 # dot(const SGVec3<T>& v1, const SGVec3<T>& v2)
 # { return v1(0)*v2(0) + v1(1)*v2(1) + v1(2)*v2(2); }
@@ -52,25 +66,12 @@ def norm_vector_length(rv):
 
 # print out a quaternion - x,y,z,w
 def show_quat(rv4):
-	
-	#my $x = ${$rv4}[$QX];
-	#my $y = ${$rv4}[$QY];
-	#my $z = ${$rv4}[$QZ];
-	#my $w = ${$rv4}[$QW];
-	#print rv4
-	pass
-	
-	#print "x %s, y %s, z %s, w %s" % rv4
+	print "x %s, y %s, z %s, w %s" % (rv4.x, rv4.y, rv4.z, rv4.w)
 	
 
 # print out a vector3
 def show_vec3(rv3):
-	"""my ($rv3) = @_;
-	my $x = ${$rv3}[0];
-	my $y = ${$rv3}[1];
-	my $z = ${$rv3}[2];
-	"""
-	print "x %s, y %s, z %s" % rv3
+	print "x %s, y %s, z %s"  % (rv4.x, rv4.y, rv4.z)
 
 
 #/// The conjugate of the quaternion, this is also the
@@ -78,28 +79,18 @@ def show_vec3(rv3):
 #SGQuat<T> conj(const SGQuat<T>& v)
 #{ return SGQuat<T>(-v(0), -v(1), -v(2), v(3)); }
 def quat_conj(rq):
-	#my ($rq) = @_;
-	#my @q = (0,0,0,0);
 	q = Quat()
 	q.x =  rq.x * -1
 	q.y =  rq.y * -1
 	q.z =  rq.z * -1
 	q.w =  rq.w 
-	# return [ -${$rq}[0], -${$rq}[1], -${$rq}[2], ${$rq}[3] ];
 	return q
 
 
 
 #/// Quaternion multiplication
 def mult_quats(rv1, rv2):
-	#my ($rv1,$rv2) = @_;
-	#my @v = (0,0,0,0);
 	q = Quat()
-	""" $v[$QX] = ${$rv1}[$QW] * ${$rv2}[$QX] + ${$rv1}[$QX] * ${$rv2}[$QW] + ${$rv1}[$QY] * ${$rv2}[$QZ] - ${$rv1}[$QZ] * ${$rv2}[$QY];
-	$v[$QY] = ${$rv1}[$QW] * ${$rv2}[$QY] - ${$rv1}[$QX] * ${$rv2}[$QZ] + ${$rv1}[$QY] * ${$rv2}[$QW] + ${$rv1}[$QZ] * ${$rv2}[$QX];
-	$v[$QZ] = ${$rv1}[$QW] * ${$rv2}[$QZ] + ${$rv1}[$QX] * ${$rv2}[$QY] - ${$rv1}[$QY] * ${$rv2}[$QX] + ${$rv1}[$QZ] * ${$rv2}[$QW];
-	$v[$QW] = ${$rv1}[$QW] * ${$rv2}[$QW] - ${$rv1}[$QX] * ${$rv2}[$QX] - ${$rv1}[$QY] * ${$rv2}[$QY] - ${$rv1}[$QZ] * ${$rv2}[$QZ];
-	"""
 	q.x =  rv1.w * rv2.x + rv1.x * rv2.w + rv1.y * rv2.z - rv1.z * rv2.y
 	q.y =  rv1.w * rv2.y - rv1.x * rv2.z + rv1.y * rv2.w + rv1.z * rv2.x
 	q.z =  rv1.w * rv2.z + rv1.x * rv2.y - rv1.y * rv2.x + rv1.z * rv2.w
@@ -125,7 +116,6 @@ sub mult_vec3($$) {
 # SGVec3<T> operator*(S s, const SGVec3<T>& v)
 #{ return SGVec3<T>(s*v(0), s*v(1), s*v(2)); }
 def scalar_mult_vector(s, rv):
-	#my @v = (0,0,0);
 	v = Vec3()
 	v.x = rv.x * s 
 	v.y = rv.y * s 
@@ -166,8 +156,7 @@ def scalar_mult_vector(s, rv):
 #    }
 #  }
 def getEulerRad(rq):
-	#my ($rq, $rzRad, $ryRad, $rxRad) = @_;
-	#my ($xRad,$yRad,$zRad);
+
 	sqrQW = rq.w * rq.w
 	sqrQX = rq.x * rq.x
 	sqrQY = rq.y * rq.y
@@ -190,7 +179,6 @@ def getEulerRad(rq):
 	else:
 		yRad = -math.asin(tmp) # needs Math::Trig
 	
-
 	# x * y + w * z
 	num = 2 * ( rq.x * rq.y + rq.w * rq.z ) 
 	den = sqrQW + sqrQX - sqrQY - sqrQZ
@@ -208,20 +196,11 @@ def getEulerRad(rq):
 	rad.y = yRad
 	rad.z = zRad
 	return rad
-	#${$rxRad} = $xRad;
-	#${$ryRad} = $yRad;
-	#${$rzRad} = $zRad;
 
 
 # uses getEulerRad, and converts to degrees
 def getEulerDeg(rq): #, rroll, rpitch, rhead):
-	#my ($rq,$rzDeg,$ryDeg,$rxDeg) = @_;
-	#my ($xRad,$yRad,$zRad);
 	rads = getEulerRad( rq )# , \$xRad, \$yRad, \$zRad)
-	# pass converted values back
-	#${$rzDeg} = fgs_rad2deg($zRad);
-	#${$ryDeg} = fgs_rad2deg($yRad);
-	#${$rxDeg} = fgs_rad2deg($xRad);
 	ob = RetVars()
 	ob.heading = fgs_rad2deg(rads.z)
 	ob.pitch = fgs_rad2deg(rads.y)
@@ -241,12 +220,6 @@ def fgs_rad2deg(rad):
 #    q.z() = i.z();
 #    return q; }
 def fromRealImag(r, ri):
-	#my ($r, $ri) = @_;
-	#my @q = (0,0,0,0);
-	#QX = 0
-	#QY = 1
-	#QZ = 2
-	#QW = 3
 	q = Quat()
 	q.w = r 
 	q.x = ri.x
@@ -264,7 +237,7 @@ def fromRealImag(r, ri):
 #    T angle2 = T(0.5)*nAxis;
 #    return fromRealImag(cos(angle2), T(sin(angle2)/nAxis)*axis); }
 def fromAngleAxis(raxis):
-	#my ($raxis) = @_;
+
 	nAxis = norm_vector_length(raxis);
 	if nAxis <= 0.0000001:
 		arr = [0,0,0,0]
@@ -273,11 +246,7 @@ def fromAngleAxis(raxis):
 	angle2 = nAxis * 0.5
 	sang = math.sin(angle2) / nAxis 
 	cang = math.cos(angle2)
-	#print "nAxis = $nAxis, ange2 = $angle2, saxa = $sang\n";
 	rv = scalar_mult_vector(sang, raxis)
-	#print "san ";
-	#show_vec3($rv);
-	#return fromRealImag(cos(angle2), T(sin(angle2)/nAxis)*axis);
 	return fromRealImag( cang, rv );
 
 
@@ -301,8 +270,6 @@ def fromAngleAxis(raxis):
 #    q.z() = Szd2*Cyd2;
 #    return q;  }
 def fromLonLatRad(lonr, latr):
-	#my ($lonr,$latr) = @_;
-	#my @q = (0,0,0,0);
 	zd2 = 0.5 * lonr
 	yd2 = -0.25 * SGD_PI - (0.5 * latr)
 	Szd2 = math.sin(zd2)
@@ -344,34 +311,27 @@ def fromLonLatRad(lonr, latr):
 #        *roll = rDeg;
 #}
 def euler_get(lat, lon, ox, oy, oz):
-	#my ($lat, $lon, $ox, $oy, $oz, $rhead, $rpitch, $rroll) = @_;
-	#/* FGMultiplayMgr::ProcessPosMsg */
-	#my @angleAxis = ($ox,$oy,$oz);
+
 	angleAxis = Vec3()
 	angleAxis.x = ox 
 	angleAxis.y = oy
 	angleAxis.z = oz
-	#push(@angleAxis, $ox);
-	#push(@angleAxis, $oy);
-	#push(@angleAxis, $oz);
-	#print "angleAxis ";
-	#show_vec3(\@angleAxis);
+
 	recOrient = fromAngleAxis(angleAxis) # ecOrient = SGQuatf::fromAngleAxis(angleAxis);
-	#print "recOrient "
-	show_quat(recOrient)
+	#show_quat(recOrient)
+	
 	#/* FGAIMultiplayer::update */
-	#my ($lat_rad, $lon_rad);
 	lat_rad = lat * SGD_DEGREES_TO_RADIANS
 	lon_rad = lon * SGD_DEGREES_TO_RADIANS
 	qEc2Hl = fromLonLatRad(lon_rad, lat_rad);
-	#print "fromLonLatRad ";
-	#show_quat($qEc2Hl);
+	#show_quat(qEc2Hl)
+	
 	con = quat_conj(qEc2Hl);
-	#print "conj ";
 	#show_quat($con);
+	
 	rhlOr = mult_quats(con, recOrient);
-	#print "mult ";
 	#show_quat($rhlOr);
+	
 	ob = getEulerDeg(rhlOr) #, rroll, rpitch, rhead) #, $rroll, $rpitch, $rhead )
 	return ob
 

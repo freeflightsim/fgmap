@@ -1,0 +1,44 @@
+
+; ------------------------------------------------------------
+;  Database
+; ------------------------------------------------------------
+[database]
+; Enter database credentials for mysql
+; engine://user:password@server/database
+url = mysql://root:mash@localhost/fgxnavdata810
+
+
+
+; ------------------------------------------------------------
+; Memcache
+; ------------------------------------------------------------
+[memcache]
+; 1 to enable, 0 to disable
+enabled = 1
+
+; memcache host and socket
+url = 127.0.0.1:11211
+
+; key for the mp servers list
+servers_key = "mp/servers"
+
+;key for the live flights
+flights_key = "mp/flights"
+
+
+; ------------------------------------------------------------
+;  mp servers discovery
+; ------------------------------------------------------------
+[mp_servers]
+
+; refresh rate in minutes (The DNS thread)
+refresh_rate = 2
+
+; ------------------------------------------------------------
+; Live flights
+; ------------------------------------------------------------
+[mp_flights]
+
+; refresh rate in seconds, eg 1.5 (The telnet call)
+refresh_rate = 1.5
+
