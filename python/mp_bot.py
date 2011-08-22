@@ -53,7 +53,7 @@ MP_JSON_FILE = CACHE_DIR + 'mp_servers_json.js'
 MP_JS_FILE = CACHE_DIR + 'mp_servers_js.js'
 MP_FLIGHTS_XML = CACHE_DIR + 'flights.xml'
 
-MAX_MPSERVER_ADDRESS = 5
+MAX_MPSERVER_ADDRESS = 20
 
 DATE_FORMAT = "%Y-%m-%d %H:%M:%S"
 
