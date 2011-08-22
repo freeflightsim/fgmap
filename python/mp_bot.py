@@ -303,10 +303,10 @@ statusThread.start()
 ## give status a few seconds to get a few entries
 time.sleep(2)
 
-c = 0
+
 ## Loop forever and query mp via telnet
 while True:
-	c = c + 1
+
 	#address = "85.214.37.14" #mpserver01
 	#address = "74.208.230.119" #mpserver02
 	address = mpServers.fastest()
@@ -316,7 +316,7 @@ while True:
 	else:
 		lag, flights = fetch_telnet(address, 5001, False)
 		if DEBUG:
-			print " fetch > ", address, statusThread.is_alive(), c
+			print " fetch > ", address, statusThread.is_alive()
 		
 		if flights != None:
 			f = open(MP_FLIGHTS_XML, "w")
